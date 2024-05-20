@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulador MSN</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-image: url('https://d7hftxdivxxvm.cloudfront.net/?quality=80&resize_to=width&src=https%3A%2F%2Fartsy-media-uploads.s3.amazonaws.com%2F2RNK1P0BYVrSCZEy_Sd1Ew%252F3417757448_4a6bdf36ce_o.jpg&width=910'); /* Substitua pela URL da imagem desejada */
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        max-width: 100vw;
+        overflow-x: hidden;
+        max-height: 100vh;
+        overflow-y: hidden;
+      }
+      .msn-container {
+        width: 600px;
+        height: 600px;
+        background-color: #ffffff;
+        border: 2px solid #a8c4e4;
+        border-radius: 8px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+      }
+      #msn-container {
+        position: absolute;
+        left: 30%;
+        top: 20%;
+        transform: translate(-50%, -50%);
+        z-index: 1;
+      }
+      .msn-header {
+        background: linear-gradient(to bottom, #b7d7f2, #a8c4e4);
+        padding: 10px;
+        color: #2e2e2e;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+      }
+      .user-info {
+        display: flex;
+        align-items: center;
+      }
+      .msn-header .user-info {
+        display: flex;
+        align-items: center;
+      }
+      .msn-header .user-info img {
+        /* border: 2px solid #ff0000; */
+        border: 2px solid #ff0000;
+        border-radius: 50%;
+        margin-right: 10px;
+      }
+      .msn-header .status {
+        font-weight: bold;
+      }
+      .msn-messages {
+        flex: 1;
+        padding: 10px;
+        background-color: #e7ebf2;
+        overflow-y: auto;
+        border-top: 2px solid #a8c4e4;
+        border-bottom: 2px solid #a8c4e4;
+      }
+      .msn-message {
+        margin-bottom: 10px;
+      }
+      .msn-message .sender {
+        font-weight: bold;
+      }
+      .msn-message .status-message {
+        background-color: #fff3cd;
+        color: #856404;
+        padding: 5px;
+        border: 1px solid #ffeeba;
+        border-radius: 4px;
+        margin-bottom: 10px;
+      }
+      .msn-input {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        background-color: #ffffff;
+      }
+      .msn-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #a8c4e4;
+        border-radius: 4px;
+        margin-right: 10px;
+      }
+      .msn-input button {
+        background-color: #0078d7;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .msn-input img {
+        margin-right: 5px;
+        cursor: pointer;
+      }
+      .background-border {
+        width: 100%;
+        height: 5vh;
+        background-color: #c3d9ff;
+        border: 2px 0 solid #a8c4e4;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        bottom: 0;
+        z-index: 1;
+      }
+      .emoji {
+        width: 24px;
+        height: 24px;
+        display: flex;
+        justify-content: center;
+      }
+      .msn-container.shake {
+        animation: shake 0.5s;
+        animation-timing-function: ease-in-out;
+      }
+      .window-buttons {
+        display: flex;
+        gap: 5px;
+        position: relative;
+        top: -20px;
+        left: 7px;
+      }
+      .window-buttons button {
+        border: 2px solid #a8c4e4;
+        padding: 1px;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 30px;
+        height: 25px;
+        position: relative;
+      }
+      .close-button {
+        background-color: transparent;
+        color: #fff;
+      }
+      .minimize-button {
+        background-color: transparent;
+        color: #fff;
+      }
+      .maximize-button {
+        background-color: transparent;
+        color: #fff;
+      }
+      .close-button:hover {
+        background-color: #ff0000;
+        filter: drop-shadow(0 0 5px #ff0000);
+        color: #fff;
+        border: none;
+      }
+      .minimize-button:hover {
+        background-color: #ffc107;
+        filter: drop-shadow(0 0 5px #ffc107);
+        color: #fff;
+        border: none;
+      }
+      .maximize-button:hover {
+        background-color: #28a745;
+        filter: drop-shadow(0 0 5px #28a745);
+        color: #fff;
+        border: none;
+      }
+      .shake {
+        animation: shake 0.5s;
+        animation-timing-function: ease-in-out;
+      }
+      .background-border-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 5vh;
+        cursor: pointer;
+
+        img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+      @keyframes shake {
+        0% {
+          transform: translate(1px, 1px) rotate(0deg);
+        }
+        10% {
+          transform: translate(-1px, -2px) rotate(-1deg);
+        }
+        20% {
+          transform: translate(-3px, 0px) rotate(1deg);
+        }
+        30% {
+          transform: translate(3px, 2px) rotate(0deg);
+        }
+        40% {
+          transform: translate(1px, -1px) rotate(1deg);
+        }
+        50% {
+          transform: translate(-1px, 2px) rotate(-1deg);
+        }
+        60% {
+          transform: translate(-3px, 1px) rotate(0deg);
+        }
+        70% {
+          transform: translate(3px, 1px) rotate(-1deg);
+        }
+        80% {
+          transform: translate(-1px, -1px) rotate(1deg);
+        }
+        90% {
+          transform: translate(1px, 2px) rotate(0deg);
+        }
+        100% {
+          transform: translate(1px, -2px) rotate(-1deg);
+        }
+      }
+    </style>
+  </head>
+  <body id="body">
+    <div id="msn-container">
+      <div class="msn-container">
+        <div class="msn-header">
+          <div class="user-info">
+            <img
+              src="https://cv-network.vercel.app/_next/image?url=https%3A%2F%2Fbucket-orkut.s3.amazonaws.com%2F1689016238705.jpg&w=640&q=70"
+              alt="User"
+              width="50"
+              height="50"
+            />
+            <div>
+              <div>Cíntia Samara</div>
+              <div class="status">(Ocupado)</div>
+            </div>
+          </div>
+          <div class="window-buttons">
+            <button class="minimize-button" onclick="minimizeWindow()">
+              -
+            </button>
+            <button class="maximize-button" onclick="toggleWindowState()">
+              □
+            </button>
+            <button class="close-button" onclick="closeWindow()">X</button>
+          </div>
+        </div>
+        <div class="msn-messages" id="messages">
+          <div class="msn-message status-message" style="text-align: center">
+            Cíntia Samara está Ocupado e pode não responder.
+          </div>
+          <!-- <div class="msn-message">
+            <span class="sender">Amigo:</span> Olá! Como você está?
+          </div>
+          <div class="msn-message">
+            <span class="sender">Você:</span> Estou bem, e você?
+          </div> -->
+        </div>
+        <div class="msn-input">
+          <img
+            src="https://via.placeholder.com/24"
+            class="emoji"
+            alt="Emoji"
+            alt="Enviar Arquivo"
+          />
+          <img
+            src="https://via.placeholder.com/24"
+            class="emoji"
+            alt="Emoji"
+            alt="Enviar Foto"
+          />
+          <img
+            src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg47nbX-pnzskFWbHNctzJOJ8vjo3A0Q6PivvyrPqQiINhS63pCNZVJ3Wopz5kSIDJUqM01x_B_BHj5rz-TwpGSCfRXSaxNS1CosqK3DmKYCxcLzF82zikN6PqKPuvxH_DMoXQT2meKn5xj/s1600/MSN_nudge_03.jpg"
+            class="emoji"
+            alt="Emoji make shake"
+            onclick="shakeScreen()"
+          />
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Digite uma mensagem..."
+            onkeypress="if (event.key === 'Enter') sendMessage()"
+          />
+          <button onclick="sendMessage()">Enviar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="background-border">
+      <div class="background-border-content" onclick="toggleWindow()">
+        <img
+          src="https://tm.ibxk.com.br/materias/6920/51178.jpg"
+          alt="MSN Logo"
+        />
+      </div>
+    </div>
+    <script>
+      let isMaximized = false;
+      let isDragging = false;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      const container = document.getElementById('msn-container');
+      const containerBody = document.getElementById('body');
+
+      container.addEventListener('mousedown', startDrag);
+      container.addEventListener('mouseup', stopDrag);
+      container.addEventListener('mousemove', drag);
+
+      function sendMessage() {
+        var input = document.getElementById('messageInput');
+        var message = input.value;
+        if (message.trim() === '') return;
+
+        var messageContainer = document.createElement('div');
+        messageContainer.className = 'msn-message';
+
+        var senderSpan = document.createElement('span');
+        senderSpan.className = 'sender';
+        senderSpan.textContent = 'Você:';
+
+        messageContainer.appendChild(senderSpan);
+        messageContainer.appendChild(document.createTextNode(' ' + message));
+
+        var messagesDiv = document.getElementById('messages');
+        messagesDiv.appendChild(messageContainer);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        input.value = '';
+      }
+
+      function shakeScreen() {
+        const container = document.getElementById('msn-container');
+        container.classList.add('shake');
+        var input = document.getElementById('messageInput');
+        var message = input.value;
+
+        input.value = 'Você acabou de chamar a sua atenção';
+
+        sendMessage();
+
+        setTimeout(() => {
+          container.classList.remove('shake');
+        }, 500); // Duração da animação em milissegundos
+      }
+
+      function minimizeWindow() {
+        isDragging = false;
+        const container = document.getElementById('msn-container');
+        container.style.display = 'none';
+      }
+
+      function restoreWindow() {
+        isDragging = false;
+        const container = document.getElementById('msn-container');
+        container.style = 'width: 600px; height: 600px;';
+
+        const backgroundBorder = document.querySelector('.msn-container');
+        backgroundBorder.style =
+          'width: 600px; height: 600px; border: 2px solid #a8c4e4; left: 30%; top: 20%;';
+
+        const buttons = document.querySelector('.maximize-button');
+      }
+
+      function maximizeWindow() {
+        isDragging = false;
+        const container = document.getElementById('msn-container');
+        container.style = 'width: 100%; height: 100%; left: 50%; top: 50%;';
+
+        const backgroundBorder = document.querySelector('.msn-container');
+        backgroundBorder.style = 'width: 100vw; height: 95vh; border: 0;';
+
+        const buttons = document.querySelector('.maximize-button');
+      }
+
+      function toggleWindowState() {
+        isDragging = false;
+        if (isMaximized) {
+          restoreWindow();
+          isMaximized = !isMaximized;
+        } else {
+          maximizeWindow();
+          isMaximized = !isMaximized;
+        }
+      }
+
+      function toggleWindow() {
+        isDragging = false;
+        if (!isMaximized) {
+          restoreWindow();
+        } else {
+          maximizeWindow();
+        }
+      }
+
+      function closeWindow() {
+        isDragging = false;
+        const container = document.getElementById('msn-container');
+        container.style.display = 'none';
+
+        const backgroundBorder = document.querySelector(
+          '.background-border-content',
+        );
+        backgroundBorder.style.display = 'none';
+      }
+
+      function startDrag(event) {
+        isDragging = true;
+        offsetX = container.getBoundingClientRect().left;
+        offsetY = container.getBoundingClientRect().top;
+        offsetX = event.clientX - offsetX;
+        offsetY = event.clientY - offsetY;
+      }
+
+      function stopDrag() {
+        isDragging = false;
+      }
+
+      function drag(event) {
+        if (isDragging) {
+          container.style.left = event.clientX - offsetX + 'px';
+          container.style.top = event.clientY - offsetY + 'px';
+        }
+      }
+    </script>
+  </body>
+</html>
